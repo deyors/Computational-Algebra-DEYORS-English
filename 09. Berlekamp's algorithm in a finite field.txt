@@ -1,0 +1,186 @@
+#AUXILIARY FUNCTIONS:
+
+insertRow:=proc(Q,i,r,n)
+local j;
+for j from 1 to n do
+    Q[i, j] := r[j];
+od;
+end:
+
+matrixQ:=proc(f,p)
+local n, Qm, A, i, j, r, m, R, l;
+n := degree(f);
+Qm := array(1 .. n, 1 .. n);
+A := array(1 .. n + 1);
+for i from 1 to n+1 do
+    A[i] := coeff(f, x, i - 1);
+od;
+r := array(1 .. n);
+r[1] := 1;
+for i from 2 to n do
+    r[i] := 0;
+od;
+insertRow(Qm, 1, r, n);
+for m from 1 to (n-1)*p do
+    R := r[n];
+    l := array(1 .. n);
+    l[1] := mods(-R*A[1], p);
+    for i from 2 to n do
+        l[i] := mods(r[i - 1] - mods(R*A[i], p), p);
+    od;
+    for j from 1 to n do
+        r[j] := l[j];
+    od;     
+        if irem(m,p)=0 then
+            insertRow(Qm, iquo(m, p) + 1, r, n);
+        fi:
+od;
+RETURN(Qm);  
+end:
+
+inverseModulus:=proc(a,b)
+local c, c1, c2, d, d1, d2, r1, r2, q, r, aux;
+c := max(abs(a), abs(b));
+d := min(abs(a), abs(b));
+c1 := 1;
+c2 := 0;
+d1 := 0;
+d2 := 1;
+r1 := 0;
+r2 := 1;
+while irem(c,d)<>0 do
+    q := iquo(c, d);
+    r := irem(c, d);
+    r1 := -d1*q + c1;
+    r2 := -d2*q + c2;
+    c := d;
+    d := r;
+    c1 := d1;
+    c2 := d2;
+    d1 := r1;
+    d2 := r2;
+od;
+if abs(b)>abs(a) then
+    aux := r1;
+    r1 := r2;
+    r2 := aux;
+fi;
+if a<0 then
+    r1 := -r1;
+fi;
+if b<0 then
+    r2 := -r2;
+fi;
+RETURN(r1);
+end:
+
+permuteRow:=proc(M,n,i,j)
+local k,aux; 
+for k  from 1 to n do
+    aux := M[k, i];
+    M[k, i] := M[k, j];
+    M[k, j] := aux;
+od;
+RETURN(M);
+end:
+
+berlekampVectors:=proc(M,n,p)
+local inverso,pivote,i,j,k,l; 
+for k  from 1 to n do
+    i := k;
+    while i<=n and M[k,i]=0 do      
+        i:=i+1;
+    od;
+    if i<=n then 
+        inverso:=inverseModulus(M[k,i],p);        
+        for j from 1 to n do
+            M[j, i] := mods(M[j, i]*inverso, p);
+        od;       
+        if i<>k  then
+            permuteRow(M,n,i,k);      
+        fi;
+        for l from 1 to n do           
+            pivote:=M[k,l];
+            if l<>k  then
+                 for j from 1 to n do             
+                     M[j,l]:=mods(M[j,l]-mods(M[j,k]*piv,p),p);
+                 od;
+            fi;
+        od;
+    fi;
+od;
+for i from 1 to n do   
+    M[i,i]:=M[i,i]-1;
+od;
+j := 1;
+k := 0;
+while j<=n do
+    i:=1;    
+    while i<=n  and M[j,i]=0 do
+        i:=i+1;    
+    od;
+    if i<=n then       
+        k:=k+1;
+        V||k:=array(1..n);        
+        for l from 1 to n do
+            V||k[l]:=M[j,l];        
+        od;
+    fi;
+    j := j + 1;
+od; 
+RETURN(k); 
+end:
+
+
+
+# FINAL ALGORITHM:
+
+berlekampAlgorithm:=proc(f,p)
+local Qm, g, n, r, s, v, factor, continue, factors, i, j, k;
+r := f;
+Qm := matrixQ(r, p);
+n := degree(r);
+for i from 1 to n do
+    Qm[i, i] := Qm[i, i] - 1;
+od; 
+v:=berlekampVectors(Qm,n,p); 
+for i from 1 to v do
+    U||i:=0;     
+    for j from 1 to n do
+        U||i:=V||i[j]*(x**(j-1))+U||i;      
+    od;
+od;
+factor := array(1 .. v);
+k := 1;
+i := 1;
+while k<>v do
+    i := i + 1;
+    s := 0;
+    continue := true;
+    while (s<=(p-1)) and (continue) do
+        g:=mods(Gcd(U||i-s,r),p);        
+        if g<>1 then
+            factor[k] := g;
+            k := k + 1;
+            if k=v then
+                continue:=false;          
+            fi;
+            mods(Divide(r, g, 'q'), p);
+            r := q;
+        fi;
+        s:=s+1;        
+    od;
+od;
+factor[k] := r;
+factors := 1;
+for i from 1 to k  do     
+    factors:=factors*factor[i];
+od;
+RETURN(factors); 
+end: 
+
+#EXAMPLES:
+
+berlekampAlgorithm(x^3 + 2*x^2 - x - 2, 5) #Result: (x + 1)*(x + 2)*(x - 1)
+
+berlekampAlgorithm(x^3 + 7*x^2 + 7*x - 15, 17) #Result: (x + 3)*(x + 5)*(x - 1)
