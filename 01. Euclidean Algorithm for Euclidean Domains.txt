@@ -1,0 +1,36 @@
+with(Domains):
+
+Euclid := proc(K, a, b)
+local r, i;
+r[0] := a;
+r[1] := b;
+i := 1;
+while (r[i]<> K[Input](0)) do
+    r[i + 1] := K[Rem](r[i - 1], r[i]); 
+    i := i + 1;
+od:
+return(r[i - 1])
+end:
+
+
+#EXAMPLES:
+
+#IN Z:
+
+Euclid(Z, 150, 39)  #Result: 3
+
+#IN Zp[x]:
+
+p := 13:
+Zp := Zmod(p):
+Zpx := DUP(Zp, x):
+f := Zpx[Input](15*x^5 + 2*x^3 + x):
+g := Zpx[Input](3*x^4 - 1):
+Euclid(Zpx, f, g); #Result: 4*x^2 + 12
+
+#IN Z[x]:
+
+Qx := DUP(Q, x):
+f := Qx[Input](x^2 + 2*x + 1):
+g := Qx[Input](x + 1):
+Euclid(Qx, f, g); #Result: x + 1
