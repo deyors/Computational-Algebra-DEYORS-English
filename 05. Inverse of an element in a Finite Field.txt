@@ -1,0 +1,39 @@
+with(Domains):
+
+FiniteInverse:=proc(K,e)
+local inverse, oc, r, s, t, K1, K2;
+oc:=K[Size]; #order of the field
+if isprime(oc) then
+    (r, s, t) := ExtEuclid(Z, e, oc);
+    inverse := K[Input](s);
+else:
+    K1 := K[Representation];
+    K2 := K[Extension];
+    if e = K[1] then
+        inverse := e;
+    fi:
+    (r,s,t):=ExtEuclid(K1,e,K2);     
+    if r=K1[1] then
+        inverse := s;
+    else:
+        inverse := 0;
+    fi:
+fi:
+return(inverse)
+end:
+
+#EXAMPLES:
+
+p := 13:
+Zp := Zmod(p):
+FiniteInverse(Zp, 5); #Result: 8
+
+p := 2003:
+Zp := Zmod(p):
+FiniteInverse(Zp, 5); #Result: 1202
+
+K := DUP(GF(3, 1), x):
+f := K[Input](x^3 - 2*x^2 - 1):
+Kf := SAE(K, f):
+g := Kf[Input](2*x^2 + x):
+FiniteInverse(Kf, g); #Result: 2*x^2 + 2
