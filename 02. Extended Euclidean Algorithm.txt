@@ -1,0 +1,70 @@
+with(Domains):
+
+ExtEuclid:= proc(K, a,b)
+local r, s, t, i, q, qr, qs, qt, S, T, mcd;
+
+r[0] := a;
+r[1] := b;
+
+s[0] := K[Input](1);
+s[1] := K[Input](0);
+t[0] := K[Input](0);
+t[1] := K[Input](1);
+
+i := 1;
+
+while (r[i] <>K[Input](0)) do
+    q[i] := K[Quo](r[i - 1], r[i]);
+    qr := K[`*`](q[i], r[i]);
+    qs := K[`*`](q[i], s[i]);
+    qt := K[`*`](q[i], t[i]);
+    r[i + 1] := K[`-`](r[i - 1], qr);
+    s[i + 1] := K[`-`](s[i - 1], qs);
+    t[i + 1] := K[`-`](t[i - 1], qt);
+    i := i + 1;
+od: 
+
+S := s[i - 1];
+T := t[i - 1];
+mcd := r[i - 1];
+
+return (mcd,S,T) 
+end:
+
+#EXAMPLES:
+
+ExtEuclid(Z, 150, 39) #Result: 3, 6, -23
+
+ExtEuclid(Z, 135, 26) #Result: 1, -5, 26
+
+#IN Zp[x]:
+
+p := 13:
+Zpx := DUP(Zmod(p), x):
+h := Zpx[Input](15*x^5 + 2*x^3 + x);
+l := Zpx[Input](3*x^4 - 1);
+ExtEuclid(Zpx, h, l); #Result: 4*x^2 + 12, 5*x, x^2 + 1
+
+p := 3:
+Zpx := DUP(Zmod(p), x):
+h := Zpx[Input](x^2 + 2);
+l := Zpx[Input](x + 1);
+ExtEuclid(Zpx, h, l); #Result: x + 1, 0, 1
+
+p := 3:
+Zpx := DUP(Zmod(p), x):
+h := Zpx[Input](x^2 - 3*x - 10);
+l := Zpx[Input](x^2 - x - 6);
+ExtEuclid(Zpx, h, l); #Result: 2 + x, 1, 2
+
+#IN Q[x]:
+
+Qx := DUP(Q, x):
+f := Qx[Input](x^2 + 2*x + 1);
+g := Qx[Input](x + 1);
+ExtEuclid(Qx, f, g); #Result: x + 1, 0, 1
+
+Qx := DUP(Q, x):
+f := Qx[Input](x^2 - 2*x - 3);
+g := Qx[Input](x^2 - 4*x + 3);
+ExtEuclid(Qx, f, g); #Result: -6 + 2*x, 1, -1
