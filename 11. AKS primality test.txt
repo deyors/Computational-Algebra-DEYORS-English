@@ -1,0 +1,92 @@
+#AUXILIARY FUNTIONS:
+
+binaryLength:=proc(n)
+local m, l;
+m := convert(n, binary);
+l := length(m);
+return(l)
+end:
+
+orderNmodR := proc(n,r)
+local order, new;
+order := 2;
+if (mod(n,r)=0) then
+    return("The number has no order")
+fi:
+
+while (order<=r) do
+    new := n^(order);      
+    if (mod(new,r)=n) then
+        return order;
+    else          
+        order:=order+1;
+    fi:
+od:
+end:
+
+AKS1:=proc(n)
+local a,b;    
+for a from 2 to floor(((log)[2](n))^(2 ))do
+    for b from 2 to floor(((log)[2](n))^(2 ))do
+        if a^(b)=n then              
+            return (false)
+        fi:
+    od:
+od:
+end:
+
+AKS2:=proc(n)  
+local r;
+r:=2; 
+while( r<n)do
+    if (gcd(n,r) > 1) then          
+        return(r)
+    fi:
+    if (gcd(n,r)=1) then          
+        if (orderNmodR(n,r)>(4*(binaryLength(n))^(2))) then
+            return r
+        fi:
+    fi:
+    r:=r+1;  
+od:  
+end:  
+
+
+#FINAL FUNCTION:
+
+AKS:=proc(n)  
+local a,b,fcPart,f,g,h,v,j,R;
+if (AKS1(n)=false)then      
+    return("Not prime")
+elif(AKS1(n)=true)then      
+    return("Prime")  
+fi:
+R:=AKS2(n);  
+if (R=n) then
+    return "Prime"
+fi:
+if 1 < gcd(n, R) then
+    return "Not prime";
+fi:
+fcPart:=floor(R^(1/(2))) ;  
+for j from 1 to (2*binaryLength(n)*fcPart+1)do
+    f := (x + j)^n;
+    g := x^r - 1;
+    h := rem(f, g, x) mod n;
+    v := x^n + j;
+    if h <> v then
+        return "Not prime";
+    fi:
+od:
+return("Prime")  
+end: 
+
+#EXAMPLES:
+
+AKS(31); #Result: "Prime"
+
+AKS(834); #Result: "Not prime"
+
+AKS(125); #Result: "Not prime"
+
+AKS(101); #Result: "Prime"
