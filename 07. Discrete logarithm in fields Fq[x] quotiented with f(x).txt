@@ -1,0 +1,17 @@
+Logarithm:=proc(q,b,a)
+local B, i;
+B := 1;
+i := 0;
+while B <> a do
+    B := B*b;
+    B := B mod q;
+    i := i + 1;
+od:
+return(i)
+end:
+
+#EXAMPLES:
+
+Logarithm(2003, 13, 101); #Result: 320
+
+Logarithm(769,97,463); #Result: 4
