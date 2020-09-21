@@ -1,0 +1,62 @@
+zFactorization:=proc(f,g,h,p)
+local q, c, s, t, t2, g1, h1, m, deg_h, deg_f, deg_g, sigma, alfa, delta, gamma, r, e, Zp, zero_div, coef;
+deg_f := degree(f);
+deg_h := degree(h);
+deg_g := degree(g);
+Zp := Zmod(p);
+alfa := lcoeff(f);
+zero_div := Zp[Inv](alfa);
+
+if zero_div=FAIL then
+    return ("Error: The higher degree coefficient is division by zero modulus m")
+elif  lcoeff(h)<>1 then  
+    return "Error:"*h*"is not monic polynomial"
+fi;    
+if (deg_f=deg_h+deg_g) then
+    coef := coeff(f, x, 0);
+    gamma := alfa;
+    gcdex(g, h, x, 's', 't');
+    s := s mod p;
+    t := t mod p;
+    g1 := g;
+    h1 := h;
+    e := -g*h + f;
+    m := p;
+    while degree(e)>=0 and m<2*gamma*coef do
+        c := quo(e, m, x);
+        sigma := mods(s*c, p);
+        t2 := mods(t*c, p);
+        q := quo(simplify(sigma), simplify(h), x);
+        r := rem(simplify(sigma), simplify(h), x);
+        sigma := simplify(mods(r, p));
+        t2 := simplify(mods(g*q + t2, p));
+        g1 := simplify(m*t2 + g1);
+        h1 := simplify(m*sigma + h1);
+        e := simplify(-g1*h1 + f);
+        m := m*p;
+    od;    
+    if degree(e)=-infinity then
+        delta := cont(g1);
+        g1 := g1/delta;
+        h1 := h1*delta/gamma;
+        print(g1*h1);
+        print(`In Z modulus`, p, `is:`);
+        return g1*h1 mod p;
+    else         
+        print(`The factorization doesn't exist`);   
+    fi;
+else
+    print(`Error in the input data, the degree of f is other than the sum of the degrees of g and h`);
+fi;
+end:
+
+
+#EXAMPLES:
+
+zFactorization(x^4 - 1, x - 2, x^3 + 2*x^2 - x - 2, 5); #Result: "The factorization doesn't exist"
+
+zFactorization(x^4 + 1, x - 2, x + 2, 5); #Result: "Error in the input data, the degree of f is other than the sum of the degrees of g and h"
+
+zFactorization(x^3 + x + 2, 27*x + 1, 3*x^2 + 3, 31); #Result: "Error: (3*x^2 + 3) is not monic polynomial"
+
+zFactorization(x^3 + 10*x^2 - 432*x + 5040, x, x^2 - 2, 5); #Result: (x + 30)*(x^2 - 20*x + 168), In Z modulus, 5, is: x*(x^2 + 3)
