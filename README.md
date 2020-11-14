@@ -1,4 +1,4 @@
-# Computational-Algebra-TheYorsh (English)
+# Computational-Algebra-DEYORS (English)
 Below are exposed several algorithms of Computational Algebra related with
 factorization, primality, logarithms and other properties of polynomial and
 elements of finite fields, all of it programed in Maple.
@@ -22,7 +22,7 @@ with this programs is discouraged.
 
 This material is 100% free, buy you can help me to upload more programs 
 with the donation of any amount that you see convenient to my Pay-Pal: 
-paypal.me/theyorsh
+paypal.me/deyors
 
 If you want to download the codes, is advised to open it with Notepad++
 to see the separation between lines, and then write the codes in Maple. 
